@@ -14,3 +14,9 @@ run image_to_tfrecord.py to convert jpegs to tfrecords: the tfrecord shards will
 
 run train.py
 
+
+Note: The changes done to the original inception model are minor and almost no changes
+in the modules in the inception subpackage. 
+
+
+TODO: update/modify the image pre-processing. Change FLAGS settings in the modules.
