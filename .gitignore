@@ -1,0 +1,10 @@
+*~
+*.pyc
+*.bak
+
+.idea
+
+train/*
+test_stg1/
+out
+imagenet_train
