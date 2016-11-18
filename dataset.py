@@ -25,61 +25,62 @@ tf.app.flags.DEFINE_string('data_dir', 'out',
 
 
 class Dataset(object):
-  """A simple class for handling data sets."""
-  __metaclass__ = ABCMeta
+    """A simple class for handling data sets."""
 
-  def __init__(self, name, subset):
-    """Initialize dataset using a subset and the path to the data."""
-    assert subset in self.available_subsets(), self.available_subsets()
-    self.name = name
-    self.subset = subset
+    __metaclass__ = ABCMeta
 
-  @abstractmethod
-  def num_classes(self):
-    """Returns the number of classes in the data set."""
-    return 10
+    def __init__(self, name, subset):
+        """Initialize dataset using a subset and the path to the data."""
+        assert subset in self.available_subsets(), self.available_subsets()
+        self.name = name
+        self.subset = subset
 
-  @abstractmethod
-  def num_examples_per_epoch(self):
-    """Returns the number of examples in the data subset."""
-    if self.subset == 'train':
-       return 10000
-    if self.subset == 'validation':
-       return 1000
+    @abstractmethod
+    def num_classes(self):
+        """Returns the number of classes in the data set."""
+        return 10
 
-  def download_message(self):
-    """Prints a download message for the Dataset."""
-    pass
+    @abstractmethod
+    def num_examples_per_epoch(self):
+        """Returns the number of examples in the data subset."""
+        if self.subset == 'train':
+           return 10000
+        if self.subset == 'validation':
+           return 1000
 
-  def available_subsets(self):
-    """Returns the list of available subsets."""
-    return ['train', 'validation']
+    def download_message(self):
+        """Prints a download message for the Dataset."""
+        pass
 
-  def data_files(self):
-    """Returns a python list of all (sharded) data subset files.
+    def available_subsets(self):
+        """Returns the list of available subsets."""
+        return ['train', 'validation']
 
-    Returns:
-      python list of all (sharded) data set files.
-    Raises:
-      ValueError: if there are not data_files matching the subset.
-    """
-    tf_record_pattern = os.path.join(FLAGS.data_dir, '%s-*' % self.subset)
-    data_files = tf.gfile.Glob(tf_record_pattern)
-    if not data_files:
-      print('No files found for dataset %s/%s at %s' % (self.name,
-                                                        self.subset,
-                                                        FLAGS.data_dir))
+    def data_files(self):
+        """Returns a python list of all (sharded) data subset files.
 
-      self.download_message()
-      exit(-1)
-    return data_files
+        Returns:
+          python list of all (sharded) data set files.
+        Raises:
+          ValueError: if there are not data_files matching the subset.
+        """
+        tf_record_pattern = os.path.join(FLAGS.data_dir, '%s-*' % self.subset)
+        data_files = tf.gfile.Glob(tf_record_pattern)
+        if not data_files:
+          print('No files found for dataset %s/%s at %s' % (self.name,
+                                                            self.subset,
+                                                            FLAGS.data_dir))
 
-  def reader(self):
-    """Return a reader for a single entry from the data set.
+          self.download_message()
+          exit(-1)
+        return data_files
 
-    See io_ops.py for details of Reader class.
+    def reader(self):
+        """Return a reader for a single entry from the data set.
 
-    Returns:
-      Reader object that reads the data set.
-    """
-    return tf.TFRecordReader()
+        See io_ops.py for details of Reader class.
+
+        Returns:
+          Reader object that reads the data set.
+        """
+        return tf.TFRecordReader()

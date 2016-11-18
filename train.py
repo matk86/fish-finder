@@ -1,4 +1,5 @@
-"""A library to train Inception using multiple GPU's with synchronous updates.
+"""
+run this module to train
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -344,6 +345,8 @@ def train(dataset):
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
 
+
+# implementation of the abstract Dataset class in the dataset module
 class Dset(Dataset):
 
   def num_classes(self):
