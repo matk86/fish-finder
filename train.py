@@ -19,14 +19,13 @@ from inception.scopes import arg_scope
 
 import image_processing
 import model
-from dataset import Dataset
+
 from inception import losses as model_losses
 
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string('train_dir', 'imagenet_train',
-                           """Directory where to write event logs """
-                           """and checkpoint.""")
+                           """Directory where to write event logs and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 1,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_string('subset', 'train',
@@ -346,25 +345,3 @@ def train(dataset):
         saver.save(sess, checkpoint_path, global_step=step)
 
 
-# implementation of the abstract Dataset class in the dataset module
-class Dset(Dataset):
-
-  def num_classes(self):
-    """Returns the number of classes in the data set."""
-    return 10
-
-  def num_examples_per_epoch(self):
-    """Returns the number of examples in the data subset."""
-    if self.subset == 'train':
-       return 10000
-    if self.subset == 'validation':
-       return 1000
-
-
-def main(_):
-    dataset = Dset(FLAGS.subset, FLAGS.subset)
-    train(dataset)
-
-
-if __name__ == '__main__':
-  tf.app.run()

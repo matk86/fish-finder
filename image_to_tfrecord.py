@@ -19,13 +19,16 @@ import tensorflow as tf
 tf.app.flags.DEFINE_string('train_directory', 'train',
                            'Training data directory')
 
+tf.app.flags.DEFINE_string('validation_directory', 'validation',
+                           'Validation data directory')
+
 tf.app.flags.DEFINE_string('output_directory', 'out',
-                           'Output data directory')
+                           'Processed(TTFRecords) training and validation data go in here')
 
 tf.app.flags.DEFINE_integer('train_shards', 3,
                             'Number of shards in training TFRecord files.')
 
-tf.app.flags.DEFINE_integer('test_shards', 1,
+tf.app.flags.DEFINE_integer('validation_shards', 3,
                             'Number of shards in validation TFRecord files.')
 
 tf.app.flags.DEFINE_integer('num_threads', 1,
@@ -348,14 +351,16 @@ def _process_dataset(name, directory, num_shards, labels_file):
 def main(_):
   assert not FLAGS.train_shards % FLAGS.num_threads, (
       'Please make the FLAGS.num_threads commensurate with FLAGS.train_shards')
-  assert not FLAGS.test_shards % FLAGS.num_threads, (
+  assert not FLAGS.validation_shards % FLAGS.num_threads, (
       'Please make the FLAGS.num_threads commensurate with '
       'FLAGS.validation_shards')
   print('Saving results to %s' % FLAGS.output_directory)
 
   _process_dataset('train', FLAGS.train_directory,
                    FLAGS.train_shards, FLAGS.labels_file)
-
+  _process_dataset('validation', FLAGS.validation_directory,
+                   FLAGS.validation_shards, FLAGS.labels_file)
+  
 
 if __name__ == '__main__':
   tf.app.run()
