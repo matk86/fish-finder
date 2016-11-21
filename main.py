@@ -15,18 +15,17 @@ class Dset(Dataset):
     """Returns the number of examples in the data subset."""
     # total 3777
     if self.subset == 'train':
-       return 3000
+       return 1 #3000
     if self.subset == 'validation':
-       return 777
+       return 1 #777
 
 
 def main(_):
     training_set = Dset("train", "train")
     validation_set = Dset("validation", "validation")    
     nepochs = 1 #20
-    for i in range(nepochs):
-      
-      #train(training_set)
+    for i in range(nepochs):      
+      train(training_set)
       # evaluate training accuracy
       #evaluate(training_set)
       # compute validation accuracy
@@ -36,7 +35,8 @@ def main(_):
 if __name__ == '__main__':
   tf.app.run()
 
-# all flags
+
+# all hyper-parameters aka flags
 #print(tf.app.flags.FLAGS.__dict__['__flags'])
 #{'subset': 'train',
 # 'pretrained_model_checkpoint_path': '',
