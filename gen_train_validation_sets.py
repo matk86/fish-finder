@@ -1,3 +1,6 @@
+"""
+Split the raw data into training and validation sets
+"""
 import os
 import shutil
 import numpy as np
@@ -16,7 +19,7 @@ for l in labels:
     nfiles = len(files)
     ntotal += nfiles
     print(nfiles, ntotal)
-    nvalidation_samples = 1 # int(nfiles*0.1))
+    nvalidation_samples = 1 # int(nfiles*0.1)) # 10% of the data
     ntrain_samples = 5 #nfiles - nvalidation_samples
     train_samples = np.random.choice(files, ntrain_samples)
     validation_samples = np.random.choice(files, nvalidation_samples)
