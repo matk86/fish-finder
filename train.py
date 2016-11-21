@@ -22,6 +22,8 @@ import model
 
 from inception import losses as model_losses
 
+from fish_data import FishData
+
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string('train_dir', 'imagenet_train',
@@ -345,3 +347,43 @@ def train(dataset):
         saver.save(sess, checkpoint_path, global_step=step)
 
 
+
+def main(_):
+    training_set = FishData("train")
+    assert training_set.data_files()
+    if tf.gfile.Exists(FLAGS.train_dir):
+      tf.gfile.DeleteRecursively(FLAGS.train_dir)
+    tf.gfile.MakeDirs(FLAGS.train_dir)
+    nepochs = 1 #20
+    for i in range(nepochs):      
+      train(training_set)
+
+if __name__ == '__main__':
+  tf.app.run()
+
+
+# all hyper-parameters aka flags
+#print(tf.app.flags.FLAGS.__dict__['__flags'])
+#{'subset': 'train',
+# 'pretrained_model_checkpoint_path': '',
+# 'learning_rate_decay_factor': 0.16,
+# 'eval_interval_secs': 300,
+# 'checkpoint_dir': 'imagenet_train',
+# 'data_dir': 'data',
+# 'num_examples': 50000,
+# 'run_mode': 'validation',
+# 'input_queue_memory_factor': 4,
+# 'num_readers': 2,
+# 'num_epochs_per_decay': 30.0,
+# 'batch_size': 32,
+# 'run_once': False,
+# 'image_size': 299,
+# 'num_preprocess_threads': 4,
+# 'log_device_placement': False,
+# 'eval_dir': 'imagenet_eval',
+# 'num_gpus': 1,
+# 'train_dir': 'imagenet_train',
+# 'initial_learning_rate': 0.1,
+# 'fine_tune': False,
+# 'max_steps': 1}
+        

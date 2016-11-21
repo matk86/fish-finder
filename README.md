@@ -19,7 +19,9 @@ Note:
 	
 	run image_to_tfrecord.py to convert jpegs to tfrecords
 
-	run solver.py to train
+	run train.py to train
+
+	run evaluate_*.py to evaluate training or validation data
 	
 	The changes done to the original inception model are minor and
 	almost no changes in the modules in the inception subpackage. 
