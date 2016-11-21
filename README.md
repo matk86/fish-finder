@@ -2,21 +2,35 @@ use python2.7
 
 install tensorflow
 
-create directories:
+Folders:
 
-       train, out and imagenet_train
-       
-put the raw training data in the 'train' directory
+	train: raw training data, 
 
-create 'out' directory
+	validation: raw validation data
 
-run image_to_tfrecord.py to convert jpegs to tfrecords: the tfrecord shards will be in the 'out' directory
-
-run train.py
+	data: processed data(both training and validation data in TFRecord format)
+	
+	imagenet_train: training checkpoint folder
 
 
-Note: The changes done to the original inception model are minor and almost no changes
-in the modules in the inception subpackage. 
+Note:
+	run gen_train_validation_sets.py to generate random training and validation samples
+	
+	run image_to_tfrecord.py to convert jpegs to tfrecords
+
+	run solver.py to train
+	
+	The changes done to the original inception model are minor and
+	almost no changes in the modules in the inception subpackage. 
 
 
-TODO: update/modify the image pre-processing. Change FLAGS settings in the modules.
+TODO:
+
+	update solver.py
+
+	update/modify the image pre-processing.
+
+	Change FLAGS settings in the modules.
+
+	full test
+	
