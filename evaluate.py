@@ -11,8 +11,9 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from inception import image_processing
-from inception import inception_model as inception
+import image_processing
+import model
+#from inception import inception_model as inception
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -32,7 +33,7 @@ tf.app.flags.DEFINE_boolean('run_once', False,
 tf.app.flags.DEFINE_integer('num_examples', 50000,
                             """Number of examples to run. Note that the eval """
                             """ImageNet dataset contains 50000 examples.""")
-tf.app.flags.DEFINE_string('subset', 'validation',
+tf.app.flags.DEFINE_string('run_mode', 'validation',
                            """Either 'validation' or 'train'.""")
 
 
@@ -82,7 +83,7 @@ def _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op):
       total_sample_count = num_iter * FLAGS.batch_size
       step = 0
 
-      print('%s: starting evaluation on (%s).' % (datetime.now(), FLAGS.subset))
+      print('%s: starting evaluation on (%s).' % (datetime.now(), FLAGS.run_mode))
       start_time = time.time()
       while step < num_iter and not coord.should_stop():
         top_1, top_5 = sess.run([top_1_op, top_5_op])
@@ -129,7 +130,7 @@ def evaluate(dataset):
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits, _ = inception.inference(images, num_classes)
+    logits, _ = model.inference(images, num_classes)
 
     # Calculate predictions.
     top_1_op = tf.nn.in_top_k(logits, labels, 1)
@@ -137,7 +138,7 @@ def evaluate(dataset):
 
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
-        inception.MOVING_AVERAGE_DECAY)
+        model.MOVING_AVERAGE_DECAY)
     variables_to_restore = variable_averages.variables_to_restore()
     saver = tf.train.Saver(variables_to_restore)
 
