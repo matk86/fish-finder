@@ -19,7 +19,7 @@ import tensorflow as tf
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_string('data_dir', 'out',
+tf.app.flags.DEFINE_string('data_dir', 'data',
                            """Path to the processed data, i.e. """
                            """TFRecord of Example protos.""")
 

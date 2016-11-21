@@ -6,5 +6,5 @@
 
 train/*
 test_stg1/
-out
+data/*
 imagenet_train

@@ -22,7 +22,7 @@ tf.app.flags.DEFINE_string('train_directory', 'train',
 tf.app.flags.DEFINE_string('validation_directory', 'validation',
                            'Validation data directory')
 
-tf.app.flags.DEFINE_string('output_directory', 'out',
+tf.app.flags.DEFINE_string('output_directory', 'data',
                            'Processed(TTFRecords) training and validation data go in here')
 
 tf.app.flags.DEFINE_integer('train_shards', 3,
