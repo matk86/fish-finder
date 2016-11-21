@@ -99,8 +99,8 @@ def _tower_loss(images, labels, num_classes, scope):
 
   # Build the portion of the Graph calculating the losses. Note that we will
   # assemble the total_loss using a custom function below.
-  split_batch_size = images.get_shape().as_list()[0]
-  model.loss(logits, labels, batch_size=split_batch_size)
+  batch_size = images.get_shape().as_list()[0]
+  model.loss(logits, labels, batch_size=batch_size)
 
   # Assemble all of the losses for the current tower only.
   losses = tf.get_collection(model_losses.LOSSES_COLLECTION, scope)
@@ -196,7 +196,7 @@ def train(dataset):
     # Get images and labels for ImageNet and split the batch across GPUs.
     assert FLAGS.batch_size % FLAGS.num_gpus == 0, (
         'Batch size must be divisible by number of GPUs')
-    split_batch_size = int(FLAGS.batch_size / FLAGS.num_gpus)
+    #split_batch_size = int(FLAGS.batch_size / FLAGS.num_gpus)
 
     # Override the number of preprocessing threads to account for the increased
     # number of GPU towers.
