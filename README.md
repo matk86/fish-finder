@@ -14,6 +14,7 @@ Folders:
 
 
 Note:
+
 	run gen_train_validation_sets.py to generate random training and validation samples
 	
 	run image_to_tfrecord.py to convert jpegs to tfrecords
