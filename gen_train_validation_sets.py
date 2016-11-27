@@ -4,6 +4,7 @@ Split the raw data into training and validation sets
 import os
 import shutil
 import numpy as np
+from PIL import Image
 
 
 labels = ["ALB", "BET", "DOL", "LAG", "NoF", "OTHER", "SHARK", "YFT"]
@@ -29,7 +30,14 @@ for l in labels:
     os.mkdir(train_dir)    
     os.mkdir(val_dir)
     for f in files:
+        src_file = os.path.join(src_dir, f)
+        try:
+            im = Image.open(src_file)
+            im.verify()
+        except:
+            print("Issue with : {}".format(src_file))
+            continue
         dest_dir = val_dir if f in validation_samples else train_dir
-        shutil.copy(os.path.join(src_dir, f), dest_dir)
+        shutil.copy(src_file, dest_dir)
 
         

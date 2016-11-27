@@ -16,19 +16,19 @@ import numpy as np
 
 import tensorflow as tf
 
-tf.app.flags.DEFINE_string('train_directory', 'train',
+tf.app.flags.DEFINE_string('train_directory', '/home/ubuntu/workspace/train',
                            'Training data directory')
 
-tf.app.flags.DEFINE_string('validation_directory', 'validation',
+tf.app.flags.DEFINE_string('validation_directory', '/home/ubuntu/workspace/validation',
                            'Validation data directory')
 
-tf.app.flags.DEFINE_string('output_directory', 'data',
+tf.app.flags.DEFINE_string('output_directory', '/home/ubuntu/workspace/data',
                            'Processed(TTFRecords) training and validation data go in here')
 
 tf.app.flags.DEFINE_integer('train_shards', 3,
                             'Number of shards in training TFRecord files.')
 
-tf.app.flags.DEFINE_integer('validation_shards', 3,
+tf.app.flags.DEFINE_integer('validation_shards', 1,
                             'Number of shards in validation TFRecord files.')
 
 tf.app.flags.DEFINE_integer('num_threads', 1,
@@ -171,7 +171,7 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
     num_shards: integer number of shards for this data set.
   """
   # Each thread produces N shards where N = int(num_shards / num_threads).
-  # For instance, if num_shards = 128, and the num_threads = 2, then the first
+  # For instanrce, if num_shards = 128, and the num_threads = 2, then the first
   # thread would produce shards [0, 64).
   num_threads = len(ranges)
   assert not num_shards % num_threads
