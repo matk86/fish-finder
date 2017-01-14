@@ -20,6 +20,8 @@ from __future__ import print_function
 
 import math
 import tensorflow as tf
+import csv
+import numpy as np
 
 from datasets import dataset_factory
 from nets import nets_factory
@@ -59,6 +61,18 @@ tf.app.flags.DEFINE_string(
     'dataset_dir', None, 'The directory where the dataset files are stored.')
 
 tf.app.flags.DEFINE_integer(
+    'num_train_samples', 3400,
+    'Number of training samples')
+
+tf.app.flags.DEFINE_integer(
+    'num_validation_samples', 320,
+    'Number of validation samples')
+
+tf.app.flags.DEFINE_integer(
+    'num_test_samples', 200,
+    'Number of test samples')
+
+tf.app.flags.DEFINE_integer(
     'labels_offset', 0,
     'An offset for the labels in the dataset. This flag is primarily used to '
     'evaluate the VGG and ResNet architectures which do not use a background '
@@ -79,6 +93,10 @@ tf.app.flags.DEFINE_float(
 tf.app.flags.DEFINE_integer(
     'eval_image_size', None, 'Eval image size')
 
+tf.app.flags.DEFINE_string(
+    'test_output_fname', None, 'Output csv file with the logits')
+
+
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -94,7 +112,10 @@ def main(_):
     # Select the dataset #
     ######################
     dataset = dataset_factory.get_dataset(
-        FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir)
+        FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir,
+        splits_to_sizes={'train': FLAGS.num_train_samples,
+                         'validation': FLAGS.num_validation_samples,
+                         'test': FLAGS.num_test_samples})
 
     ####################
     # Select the model #
@@ -110,9 +131,10 @@ def main(_):
     provider = slim.dataset_data_provider.DatasetDataProvider(
         dataset,
         shuffle=False,
-        common_queue_capacity=2 * FLAGS.batch_size,
+        common_queue_capacity=3 * FLAGS.batch_size,
         common_queue_min=FLAGS.batch_size)
-    [image, label] = provider.get(['image', 'label'])
+    [image, label, filename, bbox] = provider.get(['image', 'label', 'filename', 'bbox'])
+    bbx=tf.reshape(bbox, [1,1,4])      
     label -= FLAGS.labels_offset
 
     #####################################
@@ -125,13 +147,13 @@ def main(_):
 
     eval_image_size = FLAGS.eval_image_size or network_fn.default_image_size
 
-    image = image_preprocessing_fn(image, eval_image_size, eval_image_size)
+    image = image_preprocessing_fn(image, eval_image_size, eval_image_size, bbox=bbx)
 
-    images, labels = tf.train.batch(
-        [image, label],
+    images, labels, filenames = tf.train.batch(
+        [image, label, filename],
         batch_size=FLAGS.batch_size,
         num_threads=FLAGS.num_preprocessing_threads,
-        capacity=5 * FLAGS.batch_size)
+        capacity=2 * FLAGS.batch_size)
 
     ####################
     # Define the model #
@@ -177,14 +199,35 @@ def main(_):
 
     tf.logging.info('Evaluating %s' % checkpoint_path)
 
-    slim.evaluation.evaluate_once(
+    # no evaluation if testing
+    if FLAGS.test_output_fname is not None:
+      num_evals = 0
+      eval_op = []
+      final_op=[logits, filenames]
+    else:
+      num_evals=num_batches
+      eval_op=names_to_updates.values()
+      final_op=[]      
+    
+    preds_fnames = slim.evaluation.evaluate_once(
         master=FLAGS.master,
         checkpoint_path=checkpoint_path,
         logdir=FLAGS.eval_dir,
-        num_evals=num_batches,
-        eval_op=names_to_updates.values(),
+        num_evals=num_evals,
+        eval_op=eval_op,
+        final_op=final_op,      
         variables_to_restore=variables_to_restore)
+    
+    if FLAGS.test_output_fname is not None:
+      preds = preds_fnames[0]
+      fnames= preds_fnames[1]
+      with open(FLAGS.test_output_fname, 'w') as f:
+        writer = csv.writer(f)      
+        for i in range(len(preds)):
+          p = np.asarray(preds[i])
+          fname = str(fnames[i])
+          writer.writerow([fname]+p.tolist())          
 
-
+    
 if __name__ == '__main__':
   tf.app.run()

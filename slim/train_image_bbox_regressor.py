@@ -171,6 +171,18 @@ tf.app.flags.DEFINE_string(
 tf.app.flags.DEFINE_string(
     'dataset_dir', None, 'The directory where the dataset files are stored.')
 
+tf.app.flags.DEFINE_integer(
+    'num_train_samples', 3400,
+    'Number of training samples')
+
+tf.app.flags.DEFINE_integer(
+    'num_validation_samples', 320,
+    'Number of validation samples')
+
+tf.app.flags.DEFINE_integer(
+    'num_test_samples', 200,
+    'Number of test samples')
+
 tf.app.flags.DEFINE_string(
     'model_name', 'inception_v3', 'The name of the architecture to train.')
 
@@ -403,7 +415,10 @@ def main(_):
     # Select the dataset #
     ######################
     dataset = dataset_factory.get_dataset(
-        FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir)
+        FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir,
+        splits_to_sizes={'train': FLAGS.num_train_samples,
+                         'validation': FLAGS.num_validation_samples,
+                         'test': FLAGS.num_test_samples})
 
     ####################
     # Select the network #
@@ -432,10 +447,12 @@ def main(_):
           common_queue_capacity=20 * FLAGS.batch_size,
           common_queue_min=10 * FLAGS.batch_size)
       [image, bbox] = provider.get(['image', 'bbox'])
+      bbx=tf.reshape(bbox, [1,1,4])      
 
       train_image_size = FLAGS.train_image_size or network_fn.default_image_size
 
-      image = image_preprocessing_fn(image, train_image_size, train_image_size)
+      image = image_preprocessing_fn(image, train_image_size, train_image_size,
+                                     bbox=bbx)
 
       images, bboxes = tf.train.batch(
           [image, bbox],

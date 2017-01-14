@@ -14,7 +14,8 @@ python eval_image_classifier.py \
   --dataset_name=fishes \
   --dataset_split_name=train \
   --dataset_dir=${DATASET_DIR} \
-  --model_name=inception_v4
+  --model_name=inception_v4 \
+  --max_num_batches=1
 
 echo "Running evaluation on validation data"
 
@@ -24,5 +25,6 @@ python eval_image_classifier.py \
   --dataset_name=fishes \
   --dataset_split_name=validation \
   --dataset_dir=${DATASET_DIR} \
-  --model_name=inception_v4
+  --model_name=inception_v4 \
+  --max_num_batches=1
 

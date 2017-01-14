@@ -1,10 +1,2 @@
+.idea*
 *~
-*.pyc
-*.bak
-
-.idea
-
-train/*
-test_stg1/
-data/*
-imagenet_train

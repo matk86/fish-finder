@@ -11,7 +11,7 @@ PRETRAINED_CHECKPOINT_DIR=~/checkpoints
 TRAIN_DIR=/tmp/fishes/inception_v4_bbox_regression
 
 # Where the dataset is saved to.
-DATASET_DIR=~/workspace/data_reg
+DATASET_DIR=~/workspace/data_bbox
 
 # Fine-tune only the new layers for 5000 steps.
 python train_image_bbox_regressor.py \
@@ -41,7 +41,8 @@ python eval_image_regressor.py \
   --dataset_name=fishes_bboxes \
   --dataset_split_name=train \
   --dataset_dir=${DATASET_DIR} \
-  --model_name=inception_v4_regression
+  --model_name=inception_v4_regression \
+  --max_num_batches=1 
 
 echo "Running evaluation on validation data"
 
@@ -51,5 +52,5 @@ python eval_image_regressor.py \
   --dataset_name=fishes_bboxes \
   --dataset_split_name=validation \
   --dataset_dir=${DATASET_DIR} \
-  --model_name=inception_v4_regression
-
+  --model_name=inception_v4_regression \
+  --max_num_batches=1

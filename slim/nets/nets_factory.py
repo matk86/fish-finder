@@ -64,6 +64,7 @@ arg_scopes_map = {'alexnet_v2': alexnet.alexnet_v2_arg_scope,
                   'inception_v1': inception.inception_v3_arg_scope,
                   'inception_v2': inception.inception_v3_arg_scope,
                   'inception_v3': inception.inception_v3_arg_scope,
+                  'inception_v4': inception.inception_v4_arg_scope,
                   'inception_v4_regression': inception.inception_v4_regression_arg_scope,
                   'inception_resnet_v2':
                   inception.inception_resnet_v2_arg_scope,
