@@ -1,14 +1,6 @@
-use python2.7
+Use python2.7 and install tensorflow.
 
-install tensorflow
-
-Generate random training and validation samples:
-
-	 python gen_train_validation_sets.py
-	
-Convert jpegs to tfrecords:
-
-	python image_to_tfrecord.py
+Prepare data as described in ./datasets.
 
 cd models/slim
 

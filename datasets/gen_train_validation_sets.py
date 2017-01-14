@@ -1,20 +1,18 @@
+#!/usr/bin/python2
 """
 Split the raw data into training and validation sets
 """
+
 import os
 import shutil
 import numpy as np
 from PIL import Image
 
-
 labels = ["ALB", "BET", "DOL", "LAG", "NoF", "OTHER", "SHARK", "YFT"]
 
-data_dir = os.path.expanduser("~/workspace/fisheries/datasets/train") # directory containing all the data
-validation_dir = os.path.expanduser("~/workspace/validation")
-training_dir = os.path.expanduser("~/workspace/train")
-#nvalidation_samples = 1 
-#ntrain_samples = 5
-
+data_dir = os.path.expanduser("./train") # directory containing all the data
+validation_dir = os.path.expanduser("./data/validation")
+training_dir = os.path.expanduser("./data/train")
 
 ntotal = 0
 for l in labels:

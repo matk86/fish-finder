@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 from glob import glob
 import json
 
@@ -23,5 +25,5 @@ for jf in json_files:
             print("no annotations: {}".format(dct))
     #alld.extend(d)
 
-json.dump(alld_dict, open("../labels.json", "w"))
+json.dump(alld_dict, open("../bboxes.json", "w"))
 print(len(alld_dict))

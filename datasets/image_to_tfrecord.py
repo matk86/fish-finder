@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 """
 Convert jpegs to TFRecords
 """
@@ -11,18 +13,19 @@ import os
 import random
 import sys
 import threading
+import json
 
 import numpy as np
 
 import tensorflow as tf
 
-tf.app.flags.DEFINE_string('train_directory', '/home/ubuntu/workspace/train',
+tf.app.flags.DEFINE_string('train_directory', '/home/ray/TF_workspace/train',
                            'Training data directory')
 
-tf.app.flags.DEFINE_string('validation_directory', '/home/ubuntu/workspace/validation',
+tf.app.flags.DEFINE_string('validation_directory', '/home/ray/TF_workspace/validation',
                            'Validation data directory')
 
-tf.app.flags.DEFINE_string('output_directory', '/home/ubuntu/workspace/data',
+tf.app.flags.DEFINE_string('output_directory', '/home/ray/TF_workspace/data',
                            'Processed(TTFRecords) training and validation data go in here')
 
 tf.app.flags.DEFINE_integer('train_shards', 3,
@@ -52,7 +55,7 @@ def _bytes_feature(value):
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-def _convert_to_example(filename, image_buffer, label, text, height, width):
+def _convert_to_example(filename, image_buffer, label, text, height, width, bbox):
   """Build an Example proto for an example.
 
   Args:
@@ -75,11 +78,13 @@ def _convert_to_example(filename, image_buffer, label, text, height, width):
       'image/width': _int64_feature(width),
       'image/colorspace': _bytes_feature(colorspace),
       'image/channels': _int64_feature(channels),
-      'image/class/label': _int64_feature(label),
-      'image/class/text': _bytes_feature(text),
+      #'image/class/label': _int64_feature(label),
+      #'image/class/text': _bytes_feature(text),
       'image/format': _bytes_feature(image_format),
       'image/filename': _bytes_feature(os.path.basename(filename)),
-      'image/encoded': _bytes_feature(image_buffer)}))
+      'image/encoded': _bytes_feature(image_buffer),
+      'image/bbox': tf.train.Feature(float_list=tf.train.FloatList(value=bbox))
+  }))
   return example
 
 
@@ -156,7 +161,7 @@ def _process_image(filename, coder):
 
 
 def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
-                               texts, labels, num_shards):
+                               texts, labels, num_shards, bboxes):
   """Processes and saves list of images as TFRecord in 1 thread.
 
   Args:
@@ -194,13 +199,14 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
     files_in_shard = np.arange(shard_ranges[s], shard_ranges[s + 1], dtype=int)
     for i in files_in_shard:
       filename = filenames[i]
-      label = labels[i]
-      text = texts[i]
+      #label = labels[i]
+      #text = texts[i]
+      bbox = bboxes[i]
 
       image_buffer, height, width = _process_image(filename, coder)
 
-      example = _convert_to_example(filename, image_buffer, label,
-                                    text, height, width)
+      example = _convert_to_example(filename, image_buffer, "",
+                                    "", height, width, bbox)
       writer.write(example.SerializeToString())
       shard_counter += 1
       counter += 1
@@ -220,7 +226,7 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
   sys.stdout.flush()
 
 
-def _process_image_files(name, filenames, texts, labels, num_shards):
+def _process_image_files(name, filenames, texts, labels, num_shards, bboxes):
   """Process and save list of images as TFRecord of Example protos.
 
   Args:
@@ -230,8 +236,8 @@ def _process_image_files(name, filenames, texts, labels, num_shards):
     labels: list of integer; each integer identifies the ground truth
     num_shards: integer number of shards for this data set.
   """
-  assert len(filenames) == len(texts)
-  assert len(filenames) == len(labels)
+  assert len(filenames) == len(bboxes)
+  #assert len(filenames) == len(labels)
 
   # Break all images into batches with a [ranges[i][0], ranges[i][1]].
   spacing = np.linspace(0, len(filenames), FLAGS.num_threads + 1).astype(np.int)
@@ -252,7 +258,7 @@ def _process_image_files(name, filenames, texts, labels, num_shards):
   threads = []
   for thread_index in range(len(ranges)):
     args = (coder, thread_index, ranges, name, filenames,
-            texts, labels, num_shards)
+            texts, labels, num_shards, bboxes)
     t = threading.Thread(target=_process_image_files_batch, args=args)
     t.start()
     threads.append(t)
@@ -301,22 +307,23 @@ def _find_image_files(data_dir, labels_file):
   labels = []
   filenames = []
   texts = []
+  bboxes = []
 
   # Leave label index 0 empty as a background class.
   label_index = 1
 
+  # Load bboxes data.
+  bboxes_dict = json.load(open("bboxes.json", "r"))
+
   # Construct the list of JPEG files and labels.
-  for text in unique_labels:
-    jpeg_file_path = '%s/%s/*' % (data_dir, text)
-    matching_files = tf.gfile.Glob(jpeg_file_path)
-
-    labels.extend([label_index] * len(matching_files))
-    texts.extend([text] * len(matching_files))
-    filenames.extend(matching_files)
-
-    if not label_index % 100:
-      print('Finished finding files in %d of %d classes.' % (
-          label_index, len(labels)))
+  for label in unique_labels:
+    for file in tf.gfile.Glob('%s/%s/*' % (data_dir, label)):
+      fname=file.split("/")[-1]
+      if fname in bboxes_dict:
+        labels.append(label_index)
+        texts.append(label)
+        filenames.append(file)
+        bboxes.append(bboxes_dict[fname])
     label_index += 1
 
   # Shuffle the ordering of all image files in order to guarantee
@@ -329,10 +336,11 @@ def _find_image_files(data_dir, labels_file):
   filenames = [filenames[i] for i in shuffled_index]
   texts = [texts[i] for i in shuffled_index]
   labels = [labels[i] for i in shuffled_index]
+  bboxes = [bboxes[i] for i in shuffled_index]  
 
-  print('Found %d JPEG files across %d labels inside %s.' %
-        (len(filenames), len(unique_labels), data_dir))
-  return filenames, texts, labels
+  print('Found %d JPEG files and %d bounding boxes inside %s.' %
+        (len(filenames), len(bboxes), data_dir))
+  return filenames, texts, labels, bboxes
 
 
 def _process_dataset(name, directory, num_shards, labels_file):
@@ -344,8 +352,8 @@ def _process_dataset(name, directory, num_shards, labels_file):
     num_shards: integer number of shards for this data set.
     labels_file: string, path to the labels file.
   """
-  filenames, texts, labels = _find_image_files(directory, labels_file)
-  _process_image_files(name, filenames, texts, labels, num_shards)
+  filenames, texts, labels, bboxes = _find_image_files(directory, labels_file)
+  _process_image_files(name, filenames, texts, labels, num_shards, bboxes)
 
 
 def main(_):
