@@ -7,11 +7,11 @@ import numpy as np
 from PIL import Image
 
 
-labels = ["ALB", "BET", "DOL", "LAG", "OTHER", "SHARK", "YFT"]
+labels = ["ALB", "BET", "DOL", "LAG", "OTHER", "SHARK", "YFT"] # skiped NoF
 
-data_dir = os.path.expanduser("../raw_data") # directory containing all the data
-validation_dir = os.path.expanduser("../validation")
-training_dir = os.path.expanduser("../train")
+data_dir = os.path.expanduser("../fisheries/datasets/train") # directory containing all the data
+validation_dir = os.path.expanduser("../validation_reg")
+training_dir = os.path.expanduser("../train_reg")
 #nvalidation_samples = 1 
 #ntrain_samples = 5
 

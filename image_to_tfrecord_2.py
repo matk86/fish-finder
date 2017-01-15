@@ -17,13 +17,13 @@ import numpy as np
 
 import tensorflow as tf
 
-tf.app.flags.DEFINE_string('train_directory', '/home/ray/TF_workspace/train',
+tf.app.flags.DEFINE_string('train_directory', '/home/ubuntu/workspace/train_reg',
                            'Training data directory')
 
-tf.app.flags.DEFINE_string('validation_directory', '/home/ray/TF_workspace/validation',
+tf.app.flags.DEFINE_string('validation_directory', '/home/ubuntu/workspace/validation_reg',
                            'Validation data directory')
 
-tf.app.flags.DEFINE_string('output_directory', '/home/ray/TF_workspace/data',
+tf.app.flags.DEFINE_string('output_directory', '/home/ubuntu/workspace/data_reg',
                            'Processed(TTFRecords) training and validation data go in here')
 
 tf.app.flags.DEFINE_integer('train_shards', 3,
