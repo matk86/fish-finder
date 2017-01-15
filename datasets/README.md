@@ -1,0 +1,22 @@
+*** Data preparation
+
+This directory contains code to prepare data for the bbox and fish identification NNs.
+
+1. Put bbox-related json files from this [forum post]
+(https://www.kaggle.com/c/the-nature-conservancy-fisheries-monitoring/forums/t/25902/complete-bounding-box-annotation)
+into ./orig_bbox_labels/. Note: not all json files are in OP?
+
+1. Unzip Kaggle-provided train.zip to create ./train with subdirectories ALB, BET, etc.
+
+1. Unzip Kaggle-provided test_stg1.zip to get test data.
+
+1. Run prepare_data.sh. Sharded train-* and validation-* files will be created.
+
+1. Download and unpack the Inception v4 checkpoints.
+
+~~~
+wget http://download.tensorflow.org/models/inception_v4_2016_09_09.tar.gz
+tar xzvf inception_v4_2016_09_09.tar.gz inception_v4.ckpt
+~~~
+
+TODO: consider incorporating mouth/tail data.
