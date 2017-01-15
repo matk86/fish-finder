@@ -15,13 +15,13 @@ fi
 
 
 # Where the pre-trained InceptionV4 checkpoint is saved to.
-PRETRAINED_CHECKPOINT_DIR=$1 #~/checkpoints
+PRETRAINED_CHECKPOINT_DIR=$1
 
 # Where the training (fine-tuned) checkpoint and logs will be saved to.
-TRAIN_DIR=$2 #/tmp/fishes/inception_v4_with_bbox
+TRAIN_DIR=$2
 
 # Where the dataset is saved to.
-DATASET_DIR=$3 #~/workspace/data_bbox
+DATASET_DIR=$3 
 
 TYPE=$4
 

@@ -21,7 +21,7 @@ set -e
 
 if [[ $# <  5 ]]
 then
-  echo "usage ./preprocess_fishes.sh [raw training data dir] [processed data dir] [labels file] [bboxes file] [percent] [raw testing data dir]"
+  echo "usage ./preprocess_fishes.sh [raw training data dir] [processed data dir] [labels file] [bboxes file] [percent]"
   exit
 fi
 
