@@ -64,8 +64,8 @@ TODO: Put general directory layout here.
 
 # Tensorboard
 ### Start Tensorboard on Server
-`tensorboard --logdir=/tmp/fishes/inception_v4/`
+`tensorboard --logdir=~/workspace/fish_finder/slim/tmp`
 ### SSH Tunnel to view Tensorboard
-`ssh -L 16006:127.0.0.1:6006 ubuntu@ec2-35-161-84-178.us-west-2.compute.amazonaws.com -N -v`
+`ssh -L 16006:127.0.0.1:6006 ubuntu@35.164.223.134 -N -v`
 
 go to: http://127.0.0.1:16006/
