@@ -1,7 +1,24 @@
+"""
+Use the bbox json files downloaded from kaggle and generate normalized bbox for each image in
+the training set and write it to json and csv files.
+"""
+
+import os
 from glob import glob
 import json
 import csv
+from PIL import Image
 
+# path to the raw training data directory
+train_data_dir=os.path.abspath(os.path.expanduser("~/workspace/fisheries/datasets/train"))
+all_train_images=glob(train_data_dir+"/*/*.jpg")
+
+# map iamge filename --> full path
+img_name_path_dict = {}
+for ip in all_train_images:
+    img_name_path_dict[os.path.basename(ip)] = ip
+
+# all bbox data files(from kaggle)
 json_files = glob("*_labels.json")
 
 alld_dict = {}
@@ -12,17 +29,22 @@ for jf in json_files:
         area = 0
         if "annotations" in dct:
             for anot in dct["annotations"]:
+                image_path = img_name_path_dict[os.path.basename(dct["filename"])]
+                img = Image.open(image_path)
+                W, H = img.size
                 x0 ,y0, w0, h0 = anot["x"], anot["y"], anot["width"], anot["height"]
-                x, y, w, h = x0 ,y0, w0, h0                
+                x, y, w, h = x0 ,y0, w0, h0
+                # if the bbox area is negative, skip the current iteration
                 if w0*h0 < 0:
-                    print("neagtive area: {}".format(dct["filename"]))
+                    print("negative area: {}".format(dct["filename"]))
                     continue
+                # pick the bbox with the max area
                 if w0*h0 >= area:
                     x, y, w, h = x0 ,y0, w0, h0
                     area = w*h                    
                 xmin, ymin, xmax, ymax = x ,y, x+w, y+h
                 # normalize x and y
-                xmin_n, ymin_n, xmax_n, ymax_n = xmin/w ,ymin/h, xmax/w, ymax/h
+                xmin_n, ymin_n, xmax_n, ymax_n = xmin/W ,ymin/H, xmax/W, ymax/H
                     
             #alld_dict[dct["filename"].split("/")[-1]] = [x, y, w, h]
 
